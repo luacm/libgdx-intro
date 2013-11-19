@@ -23,7 +23,7 @@ public class Shooter implements ApplicationListener {
 	private ArrayList<Enemy> mEnemies;
 	private ArrayList<Bullet> mBullets;
 	
-	private Timer enemyTimer;
+	private Timer mEnemyTimer;
 	
 	@Override
 	public void create() {		
@@ -32,9 +32,7 @@ public class Shooter implements ApplicationListener {
 		mBullets = new ArrayList<Bullet>();
 		
 		// Initialize the camera and renderer
-		float w = Gdx.graphics.getWidth();
-		float h = Gdx.graphics.getHeight();
-		mCamera = new OrthographicCamera(w, h);
+		mCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		mShapeRenderer = new ShapeRenderer();
 		
 		// Draw the player on the screen
@@ -43,9 +41,8 @@ public class Shooter implements ApplicationListener {
 		mPlayer.setY(0);
 		
 		// Schedule enemy timer
-		enemyTimer = new Timer();
-		enemyTimer.scheduleTask(new EnemyTimerTask(), 1, 1);
-		
+		mEnemyTimer = new Timer();
+		mEnemyTimer.scheduleTask(new EnemyTimerTask(), 1, 1);
 	}
 	
 	public void checkInput() {
@@ -62,7 +59,11 @@ public class Shooter implements ApplicationListener {
 		double radians = Math.atan2(py, px);
 		double vx = Math.cos(radians) * Bullet.SPEED;
 		double vy = Math.sin(radians) * Bullet.SPEED;
-		Bullet b = new Bullet(0, 0, (float)vx, (float)vy);
+		
+		double x = Math.cos(radians) * mPlayer.getWidth()/2;
+		double y = Math.sin(radians) * mPlayer.getWidth()/2;
+		
+		Bullet b = new Bullet((float)x, (float)y, (float)vx, (float)vy);
 		mBullets.add(b);
 	}
 	
@@ -143,9 +144,16 @@ public class Shooter implements ApplicationListener {
 		public void run() {
 			float w = Gdx.graphics.getWidth();
 			float h = Gdx.graphics.getHeight();
-			float x = (float)(Math.random() * w - w/2);
-			float y = (float)(Math.random() * h - h/2);
-			Enemy e = new Enemy(x, y);
+			float radians = (float)(Math.random() * (2 * Math.PI));
+			float radius = w/2 + h/2;
+			float x = (float)(Math.cos(radians) * radius);
+			float y = (float)(Math.sin(radians) * radius);
+			
+			float moveRadians = (float)Math.atan2(-y, -x);
+			float vx = (float)(Math.cos(moveRadians) * Enemy.SPEED);
+			float vy = (float)(Math.sin(moveRadians) * Enemy.SPEED);
+			
+			Enemy e = new Enemy(x, y, vx, vy);
 			mEnemies.add(e);
 		}
 	}

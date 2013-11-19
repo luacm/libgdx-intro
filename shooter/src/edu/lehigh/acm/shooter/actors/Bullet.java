@@ -23,6 +23,7 @@ public class Bullet extends ShooterShape {
 	public void draw(ShapeRenderer renderer) {
 		mX += mVx * Gdx.graphics.getDeltaTime();
 		mY += mVy * Gdx.graphics.getDeltaTime();
+		
 		renderer.begin(ShapeType.Filled);
 		renderer.setColor(0, 0, 1, 1);
 		renderer.circle(mX, mY, mWidth/2);
