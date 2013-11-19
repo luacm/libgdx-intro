@@ -6,3 +6,6 @@ The sample game here is the same game we made in the [CreateJS workshop](https:/
 
 All of the learning is done by looking at the code and reading the paragraph-long comments.
 
+## How do I get started?
+
+First, to download LibGDX, grab the latest release [here](http://libgdx.badlogicgames.com/download.html). Inside the folder you download, there's a jar file that helps you setup your game. To start it, navigate to the folder in the terminal and run ```java -jar gdx-setup-ui.jar```. The app will carry you through the rest of the setup process. For much better, more detailed instructions, go [here](https://github.com/libgdx/libgdx/wiki)!
