@@ -14,7 +14,7 @@ public class Enemy extends ShooterShape {
 	@Override
 	public void draw(ShapeRenderer renderer) {
 		renderer.begin(ShapeType.Filled);
-		renderer.setColor(0, 0, 1, 1);
+		renderer.setColor(1, 0, 0, 1);
 		renderer.circle(mX, mY, mWidth/2);
 		renderer.end();
 	}

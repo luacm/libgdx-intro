@@ -1,5 +1,6 @@
 package edu.lehigh.acm.shooter.actors;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 
@@ -8,7 +9,7 @@ public class Bullet extends ShooterShape {
 	private float mVx;
 	private float mVy;
 	
-	public static final float SPEED = 10;
+	public static final float SPEED = 150;
 	
 	public Bullet(float x, float y, float vx, float vy) {
 		mX = x;
@@ -20,10 +21,10 @@ public class Bullet extends ShooterShape {
 	
 	@Override
 	public void draw(ShapeRenderer renderer) {
-		mX += mVx;
-		mY += mVy;
+		mX += mVx * Gdx.graphics.getDeltaTime();
+		mY += mVy * Gdx.graphics.getDeltaTime();
 		renderer.begin(ShapeType.Filled);
-		renderer.setColor(0, 1, 0, 1);
+		renderer.setColor(0, 0, 1, 1);
 		renderer.circle(mX, mY, mWidth/2);
 		renderer.end();
 	}

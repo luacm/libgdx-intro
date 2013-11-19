@@ -7,10 +7,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL10;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.utils.Timer;
+import com.badlogic.gdx.utils.Timer.Task;
 
 import edu.lehigh.acm.shooter.actors.Bullet;
 import edu.lehigh.acm.shooter.actors.Enemy;
 import edu.lehigh.acm.shooter.actors.Player;
+import edu.lehigh.acm.shooter.actors.ShooterShape;
 
 public class Shooter implements ApplicationListener {
 	private OrthographicCamera mCamera;
@@ -19,6 +22,8 @@ public class Shooter implements ApplicationListener {
 	
 	private ArrayList<Enemy> mEnemies;
 	private ArrayList<Bullet> mBullets;
+	
+	private Timer enemyTimer;
 	
 	@Override
 	public void create() {		
@@ -36,10 +41,15 @@ public class Shooter implements ApplicationListener {
 		mPlayer = new Player();
 		mPlayer.setX(0);
 		mPlayer.setY(0);
+		
+		// Schedule enemy timer
+		enemyTimer = new Timer();
+		enemyTimer.scheduleTask(new EnemyTimerTask(), 1, 1);
+		
 	}
 	
 	public void checkInput() {
-		if (Gdx.input.isTouched()) {
+		if (Gdx.input.justTouched()) {
 			float px = Gdx.input.getX() - Gdx.graphics.getWidth()/2;
 			float py = -(Gdx.input.getY() - Gdx.graphics.getHeight()/2);
 			shoot(px, py);
@@ -56,6 +66,51 @@ public class Shooter implements ApplicationListener {
 		mBullets.add(b);
 	}
 	
+	public void checkBulletEnemyCollision() {
+		for (int i = mBullets.size() - 1; i >= 0; i--) {
+			Bullet b = mBullets.get(i);
+			for (int j = mEnemies.size() - 1; j >= 0; j--) {
+				Enemy e = mEnemies.get(j);
+				if (circleCollision(b, e)) {
+					mBullets.remove(i);
+					mEnemies.remove(j);
+				}
+			}
+		}
+	}
+	
+	public void checkEnemyHeroCollision() {
+		
+	}
+	
+	public boolean circleCollision(ShooterShape obj1, ShooterShape obj2) {
+		float dx = obj1.getX() - obj2.getX();
+		float dy = obj1.getY() - obj2.getY();
+		float dist = (float)Math.sqrt(dx * dx + dy * dy);
+		return dist <= (obj1.getWidth()/2 + obj2.getWidth()/2);
+	}
+	
+	public void draw() {
+		// Clear the background
+		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
+		
+		// Setup the renderer
+		mShapeRenderer.setProjectionMatrix(mCamera.combined);
+		
+		// Draw the player
+		mPlayer.draw(mShapeRenderer);
+		
+		// Draw the enemies
+		for (int i = 0; i < mEnemies.size(); i++) {
+			mEnemies.get(i).draw(mShapeRenderer);
+		}
+		
+		// Draw the bullets
+		for (int i = 0; i < mBullets.size(); i++) {
+			mBullets.get(i).draw(mShapeRenderer);
+		}
+	}
 
 	@Override
 	public void dispose() {
@@ -65,19 +120,9 @@ public class Shooter implements ApplicationListener {
 	@Override
 	public void render() {		
 		checkInput();
-		
-		Gdx.gl.glClearColor(1, 1, 1, 1);
-		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
-		
-		mShapeRenderer.setProjectionMatrix(mCamera.combined);
-		mPlayer.draw(mShapeRenderer);
-		for (int i = 0; i < mEnemies.size(); i++) {
-			mEnemies.get(i).draw(mShapeRenderer);
-		}
-		for (int i = 0; i < mBullets.size(); i++) {
-			mBullets.get(i).draw(mShapeRenderer);
-		}
-		
+		checkBulletEnemyCollision();
+		checkEnemyHeroCollision();
+		draw();
 	}
 
 	@Override
@@ -91,5 +136,17 @@ public class Shooter implements ApplicationListener {
 
 	@Override
 	public void resume() {
+	}
+	
+	private class EnemyTimerTask extends Task {
+		@Override
+		public void run() {
+			float w = Gdx.graphics.getWidth();
+			float h = Gdx.graphics.getHeight();
+			float x = (float)(Math.random() * w - w/2);
+			float y = (float)(Math.random() * h - h/2);
+			Enemy e = new Enemy(x, y);
+			mEnemies.add(e);
+		}
 	}
 }
