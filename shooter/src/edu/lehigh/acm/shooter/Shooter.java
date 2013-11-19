@@ -16,6 +16,11 @@ import edu.lehigh.acm.shooter.actors.Player;
 import edu.lehigh.acm.shooter.actors.ShooterShape;
 
 public class Shooter implements ApplicationListener {
+	
+	// ===================================================================
+	// FIELDS AND PROPERTIES
+	// ===================================================================
+	
 	private OrthographicCamera mCamera;
 	private ShapeRenderer mShapeRenderer;
 	private Player mPlayer;
@@ -25,8 +30,12 @@ public class Shooter implements ApplicationListener {
 	
 	private Timer mEnemyTimer;
 	
-	@Override
-	public void create() {		
+	
+	// ===================================================================
+	// INITIALIZATION
+	// ===================================================================
+	
+	public void init() {
 		// Initialize lists
 		mEnemies = new ArrayList<Enemy>();
 		mBullets = new ArrayList<Bullet>();
@@ -45,26 +54,17 @@ public class Shooter implements ApplicationListener {
 		mEnemyTimer.scheduleTask(new EnemyTimerTask(), 1, 1);
 	}
 	
+	
+	// ===================================================================
+	// UPDATE ROUTINES
+	// ===================================================================
+	
 	public void checkInput() {
 		if (Gdx.input.justTouched()) {
 			float px = Gdx.input.getX() - Gdx.graphics.getWidth()/2;
 			float py = -(Gdx.input.getY() - Gdx.graphics.getHeight()/2);
 			shoot(px, py);
 		}		
-	}
-	
-	public void shoot(float px, float py) {
-		// Because our origin is in the center of the screen, our dy an dx
-		// are equal to py and px.
-		double radians = Math.atan2(py, px);
-		double vx = Math.cos(radians) * Bullet.SPEED;
-		double vy = Math.sin(radians) * Bullet.SPEED;
-		
-		double x = Math.cos(radians) * mPlayer.getWidth()/2;
-		double y = Math.sin(radians) * mPlayer.getWidth()/2;
-		
-		Bullet b = new Bullet((float)x, (float)y, (float)vx, (float)vy);
-		mBullets.add(b);
 	}
 	
 	public void checkBulletEnemyCollision() {
@@ -82,13 +82,6 @@ public class Shooter implements ApplicationListener {
 	
 	public void checkEnemyHeroCollision() {
 		
-	}
-	
-	public boolean circleCollision(ShooterShape obj1, ShooterShape obj2) {
-		float dx = obj1.getX() - obj2.getX();
-		float dy = obj1.getY() - obj2.getY();
-		float dist = (float)Math.sqrt(dx * dx + dy * dy);
-		return dist <= (obj1.getWidth()/2 + obj2.getWidth()/2);
 	}
 	
 	public void draw() {
@@ -112,7 +105,62 @@ public class Shooter implements ApplicationListener {
 			mBullets.get(i).draw(mShapeRenderer);
 		}
 	}
+	
+	
+	// ===================================================================
+	// HELPER METHODS
+	// ===================================================================
+	
+	public void shoot(float px, float py) {
+		// Because our origin is in the center of the screen, our dy an dx
+		// are equal to py and px.
+		double radians = Math.atan2(py, px);
+		double vx = Math.cos(radians) * Bullet.SPEED;
+		double vy = Math.sin(radians) * Bullet.SPEED;
+		
+		double x = Math.cos(radians) * mPlayer.getWidth()/2;
+		double y = Math.sin(radians) * mPlayer.getWidth()/2;
+		
+		Bullet b = new Bullet((float)x, (float)y, (float)vx, (float)vy);
+		mBullets.add(b);
+	}
+	
+	public boolean circleCollision(ShooterShape obj1, ShooterShape obj2) {
+		float dx = obj1.getX() - obj2.getX();
+		float dy = obj1.getY() - obj2.getY();
+		float dist = (float)Math.sqrt(dx * dx + dy * dy);
+		return dist <= (obj1.getWidth()/2 + obj2.getWidth()/2);
+	}
 
+	private class EnemyTimerTask extends Task {
+		@Override
+		public void run() {
+			float w = Gdx.graphics.getWidth();
+			float h = Gdx.graphics.getHeight();
+			float radians = (float)(Math.random() * (2 * Math.PI));
+			float radius = w/2 + h/2;
+			float x = (float)(Math.cos(radians) * radius);
+			float y = (float)(Math.sin(radians) * radius);
+			
+			float moveRadians = (float)Math.atan2(-y, -x);
+			float vx = (float)(Math.cos(moveRadians) * Enemy.SPEED);
+			float vy = (float)(Math.sin(moveRadians) * Enemy.SPEED);
+			
+			Enemy e = new Enemy(x, y, vx, vy);
+			mEnemies.add(e);
+		}
+	}
+	
+	
+	// ===================================================================
+	// LIBGDX LIFECYCLE EVENTS
+	// ===================================================================
+	
+	@Override
+	public void create() {		
+		init();
+	}
+	
 	@Override
 	public void dispose() {
 		mShapeRenderer.dispose();
@@ -137,24 +185,5 @@ public class Shooter implements ApplicationListener {
 
 	@Override
 	public void resume() {
-	}
-	
-	private class EnemyTimerTask extends Task {
-		@Override
-		public void run() {
-			float w = Gdx.graphics.getWidth();
-			float h = Gdx.graphics.getHeight();
-			float radians = (float)(Math.random() * (2 * Math.PI));
-			float radius = w/2 + h/2;
-			float x = (float)(Math.cos(radians) * radius);
-			float y = (float)(Math.sin(radians) * radius);
-			
-			float moveRadians = (float)Math.atan2(-y, -x);
-			float vx = (float)(Math.cos(moveRadians) * Enemy.SPEED);
-			float vy = (float)(Math.sin(moveRadians) * Enemy.SPEED);
-			
-			Enemy e = new Enemy(x, y, vx, vy);
-			mEnemies.add(e);
-		}
 	}
 }
