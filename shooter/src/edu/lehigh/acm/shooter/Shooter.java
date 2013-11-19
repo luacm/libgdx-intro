@@ -39,11 +39,17 @@ public class Shooter implements ApplicationListener {
 	
 	private boolean mGameOver; 
 	
+	private static final int BACKGROUND_WIDTH = 768;
+	private static final int BACKGROUND_HEIGHT = 512;
+	
 	
 	// ===================================================================
 	// INITIALIZATION
 	// ===================================================================
 	
+	/**
+	 * All of the code that runs when the game is first created.
+	 */
 	public void init() {
 		// Initialize our lists to be empty.
 		mEnemies = new ArrayList<Enemy>();
@@ -54,9 +60,9 @@ public class Shooter implements ApplicationListener {
 		// want to use something that more naturally mimics the human eye (like a 
 		// PerspectiveCamera). If you look at the documentation for the OrthographicCamera,
 		// you'll notice that it puts the origin in the center, with the y-axis decreasing as
-		// you go down. This is a classic Cartesian plane. We'll just set the camera to be
-		// the width and height of the game window.
-		mCamera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		// you go down. This is a classic Cartesian plane. We'll just set the camera to be a 
+		// static size - the size of our background.
+		mCamera = new OrthographicCamera(BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 		
 		// Initialize a ShapeRenderer. This is what we'll use to render our player,
 		// enemies, and bullets to the screen as vector graphics.
@@ -79,7 +85,7 @@ public class Shooter implements ApplicationListener {
 		// other assets in that empty space. Because look here - we can make a TextureRegion
 		// that represents a chunk from that original Texture. In this case, we're grabbing
 		// just the part of the Texture that represents our background.
-		TextureRegion region = new TextureRegion(texture, 0, 0, 768, 512);
+		TextureRegion region = new TextureRegion(texture, 0, 0, BACKGROUND_WIDTH, BACKGROUND_HEIGHT);
 		
 		// Then, all we do is initialize a Sprite with the TextureRegion that defines it, and then
 		// position it in the middle of the screen. Position is dictated by the top left corner,
@@ -151,6 +157,9 @@ public class Shooter implements ApplicationListener {
 		}
 	}
 	
+	/**
+	 * Draws all of our graphics to the screen.
+	 */
 	public void draw() {
 		// For right now, if the game is over, we just don't draw.
 		if (mGameOver)
@@ -319,7 +328,6 @@ public class Shooter implements ApplicationListener {
 	 */
 	@Override
 	public void resize(int width, int height) {
-		mCamera = new OrthographicCamera(width, height);
 	}
 
 	@Override
